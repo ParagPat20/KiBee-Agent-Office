@@ -50,3 +50,12 @@ agent-orchestrator.yaml
 .ao/
 .serena/
 tasks/
+
+# Agent runtime workspaces
+/Bob/
+/Boss/
+/Boss-*/
+/Employee-*/
+/JACK/
+/ROY/
+/Rickey/

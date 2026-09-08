@@ -4,9 +4,22 @@ import fastifyWebsocket from '@fastify/websocket';
 import * as crypto from 'crypto';
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import Fastify from 'fastify';
+import * as fs from 'fs';
 
 import type { AgentRuntime } from './agentRuntime.js';
 import type { AgentStateStore } from './agentStateStore.js';
+import {
+  addAgentToOffice,
+  commandAgentDirectly,
+  ensureDefaultOfficeTeam,
+  executeBossOrder,
+  getAllEmployeeWorkspaces,
+  getEmployeeWorkspace,
+  getTeamMembers,
+  getWorkspaceTree,
+  removeAgentFromOffice,
+  setEmployeeWorkspaceFolder,
+} from './bossService.js';
 import type {
   AssetCache,
   ReloadAssetsSideEffect,
@@ -19,6 +32,7 @@ import {
   WS_CLOSE_FORBIDDEN_ORIGIN,
   WS_CLOSE_UNAUTHORIZED,
 } from './constants.js';
+import { writeLayoutToFile } from './layoutPersistence.js';
 import type { AgentState } from './types.js';
 
 /** Options for creating the HTTP + WebSocket server. */
@@ -86,6 +100,7 @@ export async function createHttpServer(options: HttpServerOptions): Promise<Http
 
   registerHealthRoute(app);
   registerHookRoute(app, options);
+  registerBossRoute(app, options);
   registerWebSocketRoute(app, options);
 
   // ── Listen ──────────────────────────────────────────────────
@@ -138,6 +153,137 @@ function registerHookRoute(app: FastifyInstance, options: HttpServerOptions): vo
       reply.send('ok');
     },
   );
+}
+
+// ── Team Management & Boss Orders ─────────────────────────────
+
+function registerBossRoute(app: FastifyInstance, options: HttpServerOptions): void {
+  // Get active team members
+  app.get('/api/team', async (_request, reply) => {
+    const team = await ensureDefaultOfficeTeam(options);
+    return reply.send({ team });
+  });
+
+  // Add an employee or boss
+  app.post<{ Body: { name?: string; role?: string; isBoss?: boolean } }>(
+    '/api/team/add',
+    async (request, reply) => {
+      const { name, role, isBoss } = request.body ?? {};
+      if (!name || typeof name !== 'string') {
+        return reply.status(400).send({ error: 'Name is required' });
+      }
+      const res = await addAgentToOffice(options, name, role || 'Software Engineer', !!isBoss);
+      return reply.send(res);
+    },
+  );
+
+  // Remove an employee or boss
+  app.post<{ Body: { id?: number } }>('/api/team/remove', async (request, reply) => {
+    const id = request.body?.id;
+    if (typeof id !== 'number') {
+      return reply.status(400).send({ error: 'Valid agent ID is required' });
+    }
+    const ok = removeAgentFromOffice(options, id);
+    return reply.send({ ok, id });
+  });
+
+  // Direct command to a specific member
+  app.post<{ Body: { id?: number; task?: string } }>(
+    '/api/team/command',
+    async (request, reply) => {
+      const { id, task } = request.body ?? {};
+      if (typeof id !== 'number' || !task) {
+        return reply.status(400).send({ error: 'Valid agent ID and task are required' });
+      }
+      commandAgentDirectly(options, id, task).catch((err) => {
+        console.error('[Team] Direct command error:', err);
+      });
+      return reply.send({ status: 'ok', id, task });
+    },
+  );
+
+  // Boss order delegation & conversation
+  app.post<{ Body: { order?: string } }>('/api/boss/order', async (request, reply) => {
+    const order = request.body?.order;
+    if (!order || typeof order !== 'string') {
+      return reply.status(400).send({ error: 'Order string is required' });
+    }
+
+    try {
+      const result = await executeBossOrder(options, order.trim());
+      return reply.send({
+        status: 'ok',
+        reply: result.reply,
+        isDirective: result.isDirective,
+        tasks: result.tasks,
+        order,
+      });
+    } catch (err: unknown) {
+      const e = err as Error;
+      return reply.status(500).send({ error: e.message });
+    }
+  });
+
+  // Reset office layout to pristine OxiTech default
+  app.post('/api/layout/reset', async (_request, reply) => {
+    let defaultLayout = options.assetCache?.defaultLayout as Record<string, unknown> | undefined;
+    if (!defaultLayout) {
+      const searchPaths = [
+        crypto ? './dist/assets/default-layout-1.json' : '',
+        './webview-ui/public/assets/default-layout-1.json',
+      ];
+      for (const sp of searchPaths) {
+        if (sp && fs.existsSync(sp)) {
+          try {
+            defaultLayout = JSON.parse(fs.readFileSync(sp, 'utf-8')) as Record<string, unknown>;
+            break;
+          } catch {
+            /* ignore */
+          }
+        }
+      }
+    }
+    if (defaultLayout) {
+      writeLayoutToFile(defaultLayout);
+      options.store.broadcast({ type: 'layoutLoaded', layout: defaultLayout });
+      return reply.send({ ok: true, layout: defaultLayout });
+    }
+    return reply.status(404).send({ error: 'Default layout not found' });
+  });
+
+  // Get Workspace Tree / Directory Explorer (child/parent navigation)
+  app.get<{ Querystring: { subpath?: string } }>('/api/workspace/tree', async (request, reply) => {
+    const subpath = request.query?.subpath || '';
+    const tree = getWorkspaceTree(subpath);
+    return reply.send(tree);
+  });
+
+  // Get All Employee Workspaces & Past Deeds
+  app.get('/api/employee/workspaces', async (_request, reply) => {
+    const team = getTeamMembers(options.store);
+    const workspaces = getAllEmployeeWorkspaces(team);
+    return reply.send(workspaces);
+  });
+
+  // Assign Employee to Folder (moving to child/parent or specific path)
+  app.post<{ Body: { employeeName?: string; folderPath?: string } }>('/api/employee/assign-folder', async (request, reply) => {
+    const { employeeName, folderPath } = request.body || {};
+    if (!employeeName || typeof folderPath !== 'string') {
+      return reply.status(400).send({ error: 'employeeName and folderPath are required' });
+    }
+    const updated = setEmployeeWorkspaceFolder(employeeName, folderPath);
+    return reply.send({ status: 'ok', employeeName, assignedFolder: updated.assignedFolder });
+  });
+
+  // Get Past Deeds for Employee
+  app.get<{ Querystring: { employee?: string } }>('/api/employee/deeds', async (request, reply) => {
+    const employee = request.query?.employee;
+    if (!employee) {
+      return reply.status(400).send({ error: 'employee parameter required' });
+    }
+    const ws = getEmployeeWorkspace(employee);
+    return reply.send({ employee, pastDeeds: ws.pastDeeds || [] });
+  });
 }
 
 // ── WebSocket ──────────────────────────────────────────────────

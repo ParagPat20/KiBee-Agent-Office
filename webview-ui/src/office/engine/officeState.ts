@@ -903,6 +903,13 @@ export class OfficeState {
     }
   }
 
+  setAgentSpeech(id: number, text: string | null): void {
+    const ch = this.characters.get(id);
+    if (ch) {
+      ch.speechText = text || undefined;
+    }
+  }
+
   /** Dismiss bubble on click — permission: instant, waiting: quick fade */
   dismissBubble(id: number): void {
     const ch = this.characters.get(id);

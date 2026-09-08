@@ -162,15 +162,11 @@ export function ToolOverlay({
         const subHasPermission = isSub && ch.bubbleType === 'permission';
         let activityText: string;
         if (hasWaitingBubble && ch.waitingAwaitingInput) {
-          // Idle, waiting on the user -> dedicated label. A finished turn (Stop)
-          // shows only the checkmark and falls through to the normal idle text.
-          activityText = WAITING_INPUT_ACTIVITY_TEXT;
+          activityText = ch.speechText ? 'Awaiting Directive' : WAITING_INPUT_ACTIVITY_TEXT;
         } else if (isSub) {
           if (subHasPermission) {
             activityText = 'Needs approval';
           } else {
-            // Hover shows the subtask title; SELECTING the sub reveals its live
-            // tool activity (watched sub-agents stream it via subagentToolStart).
             const sub = subagentCharacters.find((s) => s.id === id);
             const rows = sub ? subagentTools[sub.parentAgentId]?.[sub.parentToolId] : undefined;
             const activeRow =
@@ -205,9 +201,7 @@ export function ToolOverlay({
         const teamRoleLabel = ch.isTeamLead ? 'LEAD' : ch.agentName || null;
         const hasExtraLines = !!(ch.folderName || teamRoleLabel);
 
-        // Context gauge. Every agent gets one — lead, teammate, adopted,
-        // headless — as soon as it has taken a turn. Sub-agents never do: they
-        // have no session of their own, so contextTokens stays 0.
+        // Context gauge.
         const contextRatio = ch.contextTokens / ch.maxContextTokens;
         const showContextGauge = !isSub && ch.contextTokens > 0;
 
@@ -217,7 +211,7 @@ export function ToolOverlay({
             className="absolute flex flex-col items-center -translate-x-1/2"
             style={{
               left: screenX,
-              top: screenY - (hasExtraLines ? 34 : 28),
+              top: screenY - (hasExtraLines ? 38 : 32),
               pointerEvents: isSelected ? 'auto' : 'none',
               opacity: alwaysShowOverlay && !isSelected && !isHovered ? (isSub ? 0.5 : 0.75) : 1,
               zIndex: isSelected ? 42 : 41,
@@ -225,7 +219,29 @@ export function ToolOverlay({
             data-testid="agent-overlay"
             data-agent-id={id}
           >
-            <div className="flex items-center border-border px-8 pt-2 pb-4 gap-5 pixel-panel whitespace-nowrap max-w-2xs">
+            {/* Visual Floating Speech Bubble */}
+            {ch.speechText && (
+              <div
+                className="mb-2 max-w-[260px] px-3 py-2 bg-bg/95 border-2 border-accent shadow-pixel rounded text-xs text-text animate-fade-in flex flex-col gap-1 pointer-events-auto cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  ch.speechText = undefined;
+                }}
+                title="Click to dismiss speech bubble"
+              >
+                <div className="flex items-center justify-between gap-2 border-b border-border/40 pb-0.5">
+                  <span className="font-bold text-[10px] text-accent-bright flex items-center gap-1">
+                    {ch.folderName?.toLowerCase().includes('boss') ? '👑 Boss' : '💼 ' + (ch.folderName || 'Employee')}
+                  </span>
+                  <span className="text-[10px] text-text-muted hover:text-text">×</span>
+                </div>
+                <div className="text-[11px] text-text leading-snug break-words font-sans">
+                  "{ch.speechText}"
+                </div>
+              </div>
+            )}
+
+            <div className="flex items-center border-border px-6 pt-1 pb-2 gap-4 pixel-panel whitespace-nowrap max-w-xs">
               {dotColor && (
                 <span
                   className={`w-6 h-6 rounded-full shrink-0 ${isActive && !hasPermission && !hasWaiting ? 'pixel-pulse' : ''}`}

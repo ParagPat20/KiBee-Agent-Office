@@ -100,6 +100,23 @@ export function SettingsModal({
       >
         Import Layout
       </MenuItem>
+      <MenuItem
+        onClick={async () => {
+          if (window.confirm('Reset office to default OxiTech layout? Any unsaved edits will be replaced.')) {
+            try {
+              const res = await fetch('/api/layout/reset', { method: 'POST' });
+              if (res.ok) {
+                window.location.reload();
+              }
+            } catch {
+              window.location.reload();
+            }
+            onClose();
+          }
+        }}
+      >
+        Reset Office Layout
+      </MenuItem>
       {isBrowserRuntime && (
         <input
           ref={fileInputRef}

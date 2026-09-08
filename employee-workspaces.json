@@ -1,0 +1,120 @@
+{
+  "Boss-1": {
+    "assignedFolder": "Boss-1",
+    "pastDeeds": []
+  },
+  "JACK": {
+    "assignedFolder": "JACK",
+    "pastDeeds": [
+      {
+        "id": "deed-1788641848569-rvb8",
+        "timestamp": 1788641848569,
+        "task": "Execute: one engineer create the file and other engineer execute that file of python test",
+        "order": "one engineer create the file and other engineer execute that file of python test",
+        "fileName": "script.py",
+        "fullPath": "F:\\KiBee-Agent-Office\\JACK\\script.py",
+        "fileSize": 150,
+        "summary": "Created script.py (150 bytes) for: \"Execute: one engineer create the file and other engineer execute that file of python test\""
+      },
+      {
+        "id": "deed-1788641477174-nxou",
+        "timestamp": 1788641477174,
+        "task": "Execute the Python script",
+        "order": "execute the python file too",
+        "fileName": "script.py",
+        "fullPath": "C:\\Users\\Parag\\Desktop\\script.py",
+        "fileSize": 141,
+        "summary": "Created script.py (141 bytes) for: \"Execute the Python script\""
+      },
+      {
+        "id": "deed-1788641447271-reup",
+        "timestamp": 1788641447271,
+        "task": "Create temp files cleanup script",
+        "order": "Clear the temp files",
+        "fileName": "clear_temp.py",
+        "fullPath": "C:\\Users\\Parag\\Desktop\\clear_temp.py",
+        "fileSize": 801,
+        "summary": "Created clear_temp.py (801 bytes) for: \"Create temp files cleanup script\""
+      },
+      {
+        "id": "deed-1788640621321-wsiu",
+        "timestamp": 1788640621321,
+        "task": "Execute: Tell JACK to write a serial baud test code for arduino nano",
+        "order": "Tell JACK to write a serial baud test code for arduino nano",
+        "fileName": "arduino_sketch.ino",
+        "fullPath": "F:\\KiBee-Agent-Office\\JACK\\arduino_sketch.ino",
+        "fileSize": 7598,
+        "summary": "Created arduino_sketch.ino (7598 bytes) for: \"Execute: Tell JACK to write a serial baud test code for arduino nano\""
+      }
+    ]
+  },
+  "ROY": {
+    "assignedFolder": "ROY",
+    "pastDeeds": [
+      {
+        "id": "deed-1788643276244-d6c5",
+        "timestamp": 1788643276244,
+        "task": "Execute: Try runnning command on powersheel, use antigravity cli",
+        "order": "Try runnning command on powersheel, use antigravity cli",
+        "fileName": "solution.txt",
+        "fullPath": "F:\\KiBee-Agent-Office\\ROY\\solution.txt",
+        "fileSize": 125,
+        "summary": "Created solution.txt (125 bytes) for: \"Execute: Try runnning command on powersheel, use antigravity cli\""
+      },
+      {
+        "id": "deed-1788642606157-hfmb",
+        "timestamp": 1788642606157,
+        "task": "Execute: Roy",
+        "order": "Roy",
+        "fileName": "solution.txt",
+        "fullPath": "F:\\KiBee-Agent-Office\\ROY\\solution.txt",
+        "fileSize": 73,
+        "summary": "Created solution.txt (73 bytes) for: \"Execute: Roy\""
+      },
+      {
+        "id": "deed-1788642522659-ac7i",
+        "timestamp": 1788642522659,
+        "task": "Execute: open terminal",
+        "order": "open terminal",
+        "fileName": "solution.txt",
+        "fullPath": "F:\\KiBee-Agent-Office\\ROY\\solution.txt",
+        "fileSize": 83,
+        "summary": "Created solution.txt (83 bytes) for: \"Execute: open terminal\""
+      },
+      {
+        "id": "deed-1788642508224-gw0u",
+        "timestamp": 1788642508224,
+        "task": "Execute: Create a print function in script.py",
+        "order": "Create a print function in script.py",
+        "fileName": "script.py",
+        "fullPath": "F:\\KiBee-Agent-Office\\ROY\\script.py",
+        "fileSize": 106,
+        "summary": "Created script.py (106 bytes) for: \"Execute: Create a print function in script.py\""
+      },
+      {
+        "id": "deed-1788642415265-2n33",
+        "timestamp": 1788642415265,
+        "task": "Execute: run the file",
+        "order": "run the file",
+        "fileName": "solution.txt",
+        "fullPath": "F:\\KiBee-Agent-Office\\ROY\\solution.txt",
+        "fileSize": 82,
+        "summary": "Created solution.txt (82 bytes) for: \"Execute: run the file\""
+      },
+      {
+        "id": "deed-1788642398374-fxf7",
+        "timestamp": 1788642398374,
+        "task": "Execute: run the script.py",
+        "order": "run the script.py",
+        "fileName": "script.py",
+        "fullPath": "F:\\KiBee-Agent-Office\\ROY\\script.py",
+        "fileSize": 87,
+        "summary": "Created script.py (87 bytes) for: \"Execute: run the script.py\""
+      }
+    ]
+  },
+  "Rickey": {
+    "assignedFolder": "Rickey",
+    "pastDeeds": []
+  }
+}

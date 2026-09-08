@@ -68,7 +68,9 @@ export interface WorkspaceFolder {
   path: string;
 }
 
-interface ExtensionMessageState {
+import type { IntercomMessage } from '../components/OfficeIntercom.js';
+
+export interface ExtensionMessageState {
   agents: number[];
   selectedAgent: number | null;
   agentTools: Record<number, ToolActivity[]>;
@@ -110,6 +112,10 @@ interface ExtensionMessageState {
   setAreaMappings: (m: Record<string, string[]>) => void;
   showAreas: boolean;
   setShowAreas: (v: boolean) => void;
+  // Intercom & Speech
+  intercomMessages: IntercomMessage[];
+  addIntercomMessage: (msg: IntercomMessage) => void;
+  clearIntercomMessages: () => void;
 }
 
 function saveAgentSeats(os: OfficeState): void {
@@ -153,6 +159,15 @@ export function useExtensionMessages(
   const consentRequest = consentQueue[0] ?? null;
   const [areaMappings, setAreaMappings] = useState<Record<string, string[]>>({});
   const [showAreas, setShowAreas] = useState(false);
+  const [intercomMessages, setIntercomMessages] = useState<IntercomMessage[]>([]);
+
+  const addIntercomMessage = useCallback((msg: IntercomMessage) => {
+    setIntercomMessages((prev) => [...prev, msg]);
+  }, []);
+
+  const clearIntercomMessages = useCallback(() => {
+    setIntercomMessages([]);
+  }, []);
 
   // The renderer keeps its own module-level copy (read every rAF frame), so both
   // sources of truth move together — the persisted value on settingsLoaded and
@@ -488,6 +503,18 @@ export function useExtensionMessages(
           os.showWaitingBubble(id, msg.awaitingInput === true);
           playDoneSound();
         }
+      } else if (msg.type === 'agentSpeech') {
+        const id = msg.id as number;
+        const text = msg.text as string;
+        os.setAgentSpeech(id, text);
+      } else if (msg.type === 'intercomMessage') {
+        const message = msg.message as IntercomMessage;
+        if (message) {
+          setIntercomMessages((prev) => {
+            if (prev.some((m) => m.id === message.id)) return prev;
+            return [...prev, message];
+          });
+        }
       } else if (msg.type === 'agentToolPermission') {
         const id = msg.id as number;
         setAgentTools((prev) => {
@@ -799,5 +826,8 @@ export function useExtensionMessages(
     setAreaMappings,
     showAreas,
     setShowAreas,
+    intercomMessages,
+    addIntercomMessage,
+    clearIntercomMessages,
   };
 }

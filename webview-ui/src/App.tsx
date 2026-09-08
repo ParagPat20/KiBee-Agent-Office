@@ -1,13 +1,16 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { toMajorMinor } from './changelogData.js';
+import { BossOrderBar } from './components/BossOrderBar.js';
 import { BottomToolbar } from './components/BottomToolbar.js';
 import { ChangelogModal } from './components/ChangelogModal.js';
 import { ConnectionIndicator } from './components/ConnectionIndicator.js';
 import { DebugView } from './components/DebugView.js';
 import { EditActionBar } from './components/EditActionBar.js';
+import { EmployeeWorkspaceSidebar } from './components/EmployeeWorkspaceSidebar.js';
 import { IntroBubble } from './components/IntroBubble.js';
 import { MigrationNotice } from './components/MigrationNotice.js';
+import { OfficeIntercom } from './components/OfficeIntercom.js';
 import { SettingsModal } from './components/SettingsModal.js';
 import { Tooltip } from './components/Tooltip.js';
 import { Modal } from './components/ui/Modal.js';
@@ -96,7 +99,30 @@ function App() {
     setAreaMappings,
     showAreas,
     setShowAreas,
+    intercomMessages,
+    clearIntercomMessages,
   } = useExtensionMessages(getOfficeState, editor.setLastSavedLayout, isEditDirty);
+
+  const [isIntercomSending, setIsIntercomSending] = useState(false);
+  const handleSendIntercomMessage = useCallback(async (text: string) => {
+    if (!text.trim() || isIntercomSending) return;
+    setIsIntercomSending(true);
+    const token = new URLSearchParams(window.location.search).get('token') || '';
+    try {
+      await fetch('/api/boss/order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ order: text.trim() }),
+      });
+    } catch (err) {
+      console.error('[Intercom] Order error:', err);
+    } finally {
+      setIsIntercomSending(false);
+    }
+  }, [isIntercomSending]);
 
   // Show migration notice once layout reset is detected
   const [migrationNoticeDismissed, setMigrationNoticeDismissed] = useState(false);
@@ -449,6 +475,20 @@ function App() {
           onSelectAgent={handleSelectAgent}
         />
       )}
+
+      {/* Left Docked Sidebar: Employee Workspaces, Folders & Past Deeds Context */}
+      <EmployeeWorkspaceSidebar />
+
+      {/* Floating Boss Command Bar */}
+      <BossOrderBar />
+
+      {/* Right Docked Sidebar: Antigravity IDE Style Office Intercom & Chat Panel */}
+      <OfficeIntercom
+        messages={intercomMessages}
+        onSendMessage={handleSendIntercomMessage}
+        onClearMessages={clearIntercomMessages}
+        isSending={isIntercomSending}
+      />
 
       {/* Hooks first-run tooltip. Gated on hooksInstalled (the hooksStatus
           message), NOT the hooksEnabled preference: hooksEnabled defaults true

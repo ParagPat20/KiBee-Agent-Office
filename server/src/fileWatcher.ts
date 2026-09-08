@@ -1504,12 +1504,23 @@ function scanGlobalProjectDirs(
     // Skip directories already tracked by workspace scanning
     if (isTrackedProjectDir(dirPath)) continue;
 
-    let files: string[];
+    let files: string[] = [];
     try {
-      files = fs
+      const direct = fs
         .readdirSync(dirPath)
         .filter((f) => f.endsWith('.jsonl'))
         .map((f) => path.join(dirPath, f));
+      files.push(...direct);
+
+      // Support Antigravity IDE layout (.system_generated/logs/transcript.jsonl)
+      const logsDir = path.join(dirPath, '.system_generated', 'logs');
+      if (fs.existsSync(logsDir)) {
+        const sub = fs
+          .readdirSync(logsDir)
+          .filter((f) => f.endsWith('.jsonl') && !f.includes('transcript_full'))
+          .map((f) => path.join(logsDir, f));
+        files.push(...sub);
+      }
     } catch {
       continue;
     }
@@ -1533,9 +1544,12 @@ function scanGlobalProjectDirs(
         continue;
       }
 
-      const folderName =
+      let folderName =
         folderNameResolver?.({ projectDir: dirPath }) ??
         folderNameFromProjectDir(path.basename(dirPath));
+      if (/^[0-9a-f]{8}-[0-9a-f]{4}/i.test(folderName)) {
+        folderName = 'Antigravity IDE';
+      }
       knownJsonlFiles.add(file);
       console.log(
         `[Pixel Agents] Watcher: detected global session ${path.basename(file)} (${folderName})`,

@@ -485,9 +485,18 @@ function handleWebviewReady(send: WsSend, ctx: ClientMessageContext): void {
   const agentMeta: Record<number, { palette?: number; hueShift?: number; seatId?: string }> = {};
   for (const [id, agent] of store) {
     agentIds.push(id);
-    if (agent.folderName) {
-      folderNames[id] = agent.folderName;
-    }
+    const name =
+      agent.folderName ||
+      (agent.projectDir ? path.basename(agent.projectDir) : '') ||
+      agent.agentName ||
+      (agent.sessionId?.includes('boss') ? 'Boss-1' :
+       agent.sessionId?.includes('roy') ? 'ROY' :
+       agent.sessionId?.includes('jack') ? 'JACK' :
+       agent.sessionId?.includes('rickey') ? 'Rickey' :
+       /^[0-9a-f]{8}-[0-9a-f]{4}/i.test(agent.sessionId || '') ? `Antigravity-${id}` :
+       agent.sessionId?.replace(/^kibee-(emp-|boss-)?/i, '') ||
+       `Agent-${id}`);
+    folderNames[id] = name;
     if (agent.isExternal) {
       externalAgents[id] = true;
     }
