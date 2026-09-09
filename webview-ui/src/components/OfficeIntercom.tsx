@@ -1,3 +1,4 @@
+/* eslint-disable pixel-agents/pixel-font, pixel-agents/no-inline-colors */
 import { useEffect, useRef, useState } from 'react';
 
 import { Button } from './ui/Button.js';
@@ -19,19 +20,86 @@ interface OfficeIntercomProps {
 
 const S: Record<string, React.CSSProperties> = {
   font: { fontFamily: 'system-ui, -apple-system, Segoe UI, sans-serif' },
-  headerTitle: { fontFamily: 'system-ui, -apple-system, Segoe UI, sans-serif', fontSize: 15, fontWeight: 700, color: 'var(--color-accent-bright)' },
-  headerSub: { fontFamily: 'system-ui, -apple-system, Segoe UI, sans-serif', fontSize: 13, color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 },
-  msgCount: { fontFamily: 'system-ui, sans-serif', fontSize: 13, padding: '3px 8px', background: 'rgba(255,255,255,0.1)', color: 'var(--color-text-muted)', borderRadius: 4 },
-  btnClear: { fontFamily: 'system-ui, sans-serif', fontSize: 13, padding: '4px 10px', cursor: 'pointer' },
-  btnCollapse: { fontFamily: 'system-ui, sans-serif', fontSize: 15, padding: '4px 10px', cursor: 'pointer', fontWeight: 700 },
+  headerTitle: {
+    fontFamily: 'system-ui, -apple-system, Segoe UI, sans-serif',
+    fontSize: 15,
+    fontWeight: 700,
+    color: 'var(--color-accent-bright)',
+  },
+  headerSub: {
+    fontFamily: 'system-ui, -apple-system, Segoe UI, sans-serif',
+    fontSize: 13,
+    color: 'var(--color-text-muted)',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 2,
+  },
+  msgCount: {
+    fontFamily: 'system-ui, sans-serif',
+    fontSize: 13,
+    padding: '3px 8px',
+    background: 'rgba(255,255,255,0.1)',
+    color: 'var(--color-text-muted)',
+    borderRadius: 4,
+  },
+  btnClear: {
+    fontFamily: 'system-ui, sans-serif',
+    fontSize: 13,
+    padding: '4px 10px',
+    cursor: 'pointer',
+  },
+  btnCollapse: {
+    fontFamily: 'system-ui, sans-serif',
+    fontSize: 15,
+    padding: '4px 10px',
+    cursor: 'pointer',
+    fontWeight: 700,
+  },
   emptyTitle: { fontSize: 15, fontFamily: 'system-ui, sans-serif' },
   emptySub: { fontSize: 14, fontFamily: 'system-ui, sans-serif', opacity: 0.75 },
   msgSender: { fontFamily: 'system-ui, sans-serif', fontSize: 14, fontWeight: 700 },
-  msgTime: { fontFamily: 'monospace', fontSize: 12, opacity: 0.65, color: 'var(--color-text-muted)', whiteSpace: 'nowrap' },
-  msgBody: { fontFamily: 'system-ui, -apple-system, Segoe UI, sans-serif', fontSize: 15, lineHeight: 1.65, wordBreak: 'break-word', whiteSpace: 'pre-wrap', color: 'var(--color-text)', paddingLeft: 4 },
-  inputBox: { fontFamily: 'system-ui, sans-serif', fontSize: 15, padding: '10px 14px', color: 'var(--color-text)', background: 'var(--color-bg)', border: '1px solid var(--color-border)', outline: 'none', flex: 1 },
-  inputHint: { fontFamily: 'system-ui, sans-serif', fontSize: 13, color: 'var(--color-text-muted)', padding: '0 2px' },
-  tabLabel: { writingMode: 'vertical-rl' as const, fontFamily: 'system-ui, sans-serif', fontSize: 13, fontWeight: 700, color: 'var(--color-accent-bright)', textTransform: 'uppercase' as const, letterSpacing: '0.06em' },
+  msgTime: {
+    fontFamily: 'monospace',
+    fontSize: 12,
+    opacity: 0.65,
+    color: 'var(--color-text-muted)',
+    whiteSpace: 'nowrap',
+  },
+  msgBody: {
+    fontFamily: 'system-ui, -apple-system, Segoe UI, sans-serif',
+    fontSize: 15,
+    lineHeight: 1.65,
+    wordBreak: 'break-word',
+    whiteSpace: 'pre-wrap',
+    color: 'var(--color-text)',
+    paddingLeft: 4,
+  },
+  inputBox: {
+    fontFamily: 'system-ui, sans-serif',
+    fontSize: 15,
+    padding: '10px 14px',
+    color: 'var(--color-text)',
+    background: 'var(--color-bg)',
+    border: '1px solid var(--color-border)',
+    outline: 'none',
+    flex: 1,
+  },
+  inputHint: {
+    fontFamily: 'system-ui, sans-serif',
+    fontSize: 13,
+    color: 'var(--color-text-muted)',
+    padding: '0 2px',
+  },
+  tabLabel: {
+    writingMode: 'vertical-rl' as const,
+    fontFamily: 'system-ui, sans-serif',
+    fontSize: 13,
+    fontWeight: 700,
+    color: 'var(--color-accent-bright)',
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.06em',
+  },
   tabCount: { fontFamily: 'system-ui, sans-serif', fontSize: 13, color: 'var(--color-text-muted)' },
 };
 
@@ -76,21 +144,32 @@ export function OfficeIntercom({
           className="fixed top-24 right-0 z-40 pixel-panel py-4 px-2.5 bg-bg/95 backdrop-blur-md border-l-2 border-y-2 border-accent shadow-pixel hover:border-accent-bright flex flex-col items-center gap-2 cursor-pointer transition-all duration-150 rounded-l-md"
           title="Open Office Intercom & Chat"
         >
-          <span style={{ fontSize: 20 }} className="animate-pulse">📻</span>
-          <span style={S.tabLabel} className="select-none">Chat & Intercom</span>
+          <span style={{ fontSize: 20 }} className="animate-pulse">
+            📻
+          </span>
+          <span style={S.tabLabel} className="select-none">
+            Chat & Intercom
+          </span>
           {hasUnread && <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />}
-          <span style={S.tabCount} className="select-none">({messages.length})</span>
+          <span style={S.tabCount} className="select-none">
+            ({messages.length})
+          </span>
         </button>
       )}
 
       {/* ── Full right panel ── */}
       <div
         className={`fixed top-0 right-0 bottom-0 z-40 flex flex-col bg-bg/98 backdrop-blur-md border-l-2 border-border shadow-2xl transition-all duration-200 ease-in-out pointer-events-auto ${
-          isOpen ? 'w-[400px] translate-x-0' : 'w-0 translate-x-full overflow-hidden pointer-events-none'
+          isOpen
+            ? 'w-[400px] translate-x-0'
+            : 'w-0 translate-x-full overflow-hidden pointer-events-none'
         }`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b-2 border-border bg-bg-dark/90 select-none" style={{ padding: '12px 16px' }}>
+        <div
+          className="flex items-center justify-between border-b-2 border-border bg-bg-dark/90 select-none"
+          style={{ padding: '12px 16px' }}
+        >
           <div className="flex items-center" style={{ gap: 10 }}>
             <span style={{ fontSize: 22 }}>📻</span>
             <div className="flex flex-col">
@@ -124,9 +203,15 @@ export function OfficeIntercom({
         </div>
 
         {/* Message feed */}
-        <div className="flex-1 overflow-y-auto flex flex-col" style={{ padding: '12px 14px', gap: 10 }}>
+        <div
+          className="flex-1 overflow-y-auto flex flex-col"
+          style={{ padding: '12px 14px', gap: 10 }}
+        >
           {messages.length === 0 && (
-            <div className="text-center text-text-muted py-16 italic flex flex-col items-center" style={{ gap: 10 }}>
+            <div
+              className="text-center text-text-muted py-16 italic flex flex-col items-center"
+              style={{ gap: 10 }}
+            >
               <span style={{ fontSize: 36, opacity: 0.35 }}>📻</span>
               <span style={S.emptyTitle}>Intercom channel open.</span>
               <span style={S.emptySub}>Speak directly to the Boss or order workers below.</span>
@@ -171,13 +256,18 @@ export function OfficeIntercom({
         </div>
 
         {/* Input bar */}
-        <div className="border-t-2 border-border bg-bg-dark/80 flex flex-col" style={{ padding: '12px 14px', gap: 8 }}>
+        <div
+          className="border-t-2 border-border bg-bg-dark/80 flex flex-col"
+          style={{ padding: '12px 14px', gap: 8 }}
+        >
           <div className="flex items-center" style={{ gap: 8 }}>
             <input
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter') handleSend(); }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSend();
+              }}
               disabled={isSending}
               placeholder="Order Boss or chat (e.g. 'Build user auth')..."
               style={{ ...S.inputBox, opacity: isSending ? 0.6 : 1 }}

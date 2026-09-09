@@ -104,25 +104,28 @@ function App() {
   } = useExtensionMessages(getOfficeState, editor.setLastSavedLayout, isEditDirty);
 
   const [isIntercomSending, setIsIntercomSending] = useState(false);
-  const handleSendIntercomMessage = useCallback(async (text: string) => {
-    if (!text.trim() || isIntercomSending) return;
-    setIsIntercomSending(true);
-    const token = new URLSearchParams(window.location.search).get('token') || '';
-    try {
-      await fetch('/api/boss/order', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({ order: text.trim() }),
-      });
-    } catch (err) {
-      console.error('[Intercom] Order error:', err);
-    } finally {
-      setIsIntercomSending(false);
-    }
-  }, [isIntercomSending]);
+  const handleSendIntercomMessage = useCallback(
+    async (text: string) => {
+      if (!text.trim() || isIntercomSending) return;
+      setIsIntercomSending(true);
+      const token = new URLSearchParams(window.location.search).get('token') || '';
+      try {
+        await fetch('/api/boss/order', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({ order: text.trim() }),
+        });
+      } catch (err) {
+        console.error('[Intercom] Order error:', err);
+      } finally {
+        setIsIntercomSending(false);
+      }
+    },
+    [isIntercomSending],
+  );
 
   // Show migration notice once layout reset is detected
   const [migrationNoticeDismissed, setMigrationNoticeDismissed] = useState(false);

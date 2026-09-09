@@ -44,6 +44,7 @@ async function execNpm(args, options = {}) {
     cwd: REPO_ROOT,
     env: { ...process.env, HUSKY: '0' },
     maxBuffer: 20 * 1024 * 1024,
+    shell: process.platform === 'win32',
     ...options,
   });
 }

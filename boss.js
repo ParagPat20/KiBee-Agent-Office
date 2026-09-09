@@ -219,7 +219,9 @@ async function initializeOffice(server) {
   console.log('👨‍💻 Seating Employee 2 (Bob - QA & Testing)...');
   await setAgentWaiting(server, EMP2_SESSION, EMP2_DIR, 'Standing by for Boss assignments');
 
-  console.log('\n✨ All 3 agents are seated at their workstations in the office, waiting for commands!\n');
+  console.log(
+    '\n✨ All 3 agents are seated at their workstations in the office, waiting for commands!\n',
+  );
 }
 
 async function main() {
@@ -262,7 +264,10 @@ async function main() {
       try {
         console.log('🧠 Boss is consulting Gemini 2.5 Flash to decompose the tasks...');
         const geminiOutput = await callGemini(order);
-        const cleanJson = geminiOutput.replace(/^```json/m, '').replace(/```$/m, '').trim();
+        const cleanJson = geminiOutput
+          .replace(/^```json/m, '')
+          .replace(/```$/m, '')
+          .trim();
         subtasks = JSON.parse(cleanJson);
       } catch (err) {
         console.warn(`⚠️  Gemini planning fallback: ${err.message}`);
@@ -325,11 +330,21 @@ async function main() {
 
       // 5. Employee 1 finishes & returns to desk
       console.log('✅ [Employee 1 (Alice)] finished implementation!');
-      await setAgentWaiting(server, EMP1_SESSION, EMP1_DIR, 'Task complete! Waiting for next order');
+      await setAgentWaiting(
+        server,
+        EMP1_SESSION,
+        EMP1_DIR,
+        'Task complete! Waiting for next order',
+      );
 
       // 6. Employee 2 finishes & returns to desk
       console.log('✅ [Employee 2 (Bob)] finished QA validation!');
-      await setAgentWaiting(server, EMP2_SESSION, EMP2_DIR, 'Verification passed! Waiting for next order');
+      await setAgentWaiting(
+        server,
+        EMP2_SESSION,
+        EMP2_DIR,
+        'Verification passed! Waiting for next order',
+      );
 
       await sleep(1000);
 

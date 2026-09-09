@@ -3,9 +3,7 @@ import * as os from 'os';
 import * as path from 'path';
 
 import type { AgentEvent, HookProvider } from '../../../../../core/src/provider.js';
-import {
-  BASH_COMMAND_DISPLAY_MAX_LENGTH,
-} from '../../../constants.js';
+import { BASH_COMMAND_DISPLAY_MAX_LENGTH } from '../../../constants.js';
 import {
   areHooksInstalled as installerAreHooksInstalled,
   installHooks as installerInstallHooks,
@@ -43,7 +41,9 @@ export function formatToolStatus(toolName: string, input?: unknown): string {
     }
     case 'order_workers': {
       const order = (inp.order as string) || (inp.instruction as string) || '';
-      return order ? `Boss: ${order.length > 50 ? order.slice(0, 50) + '…' : order}` : 'Boss ordering team';
+      return order
+        ? `Boss: ${order.length > 50 ? order.slice(0, 50) + '…' : order}`
+        : 'Boss ordering team';
     }
     case 'delegate_task':
     case 'assign_task': {

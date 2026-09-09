@@ -298,11 +298,7 @@ export class HookEventHandler {
       const transcriptPath =
         (normEvent as { transcriptPath?: string }).transcriptPath ||
         (event.transcript_path as string);
-      this.lifecycleCallbacks.onExternalSessionDetected?.(
-        event.session_id,
-        transcriptPath,
-        cwd,
-      );
+      this.lifecycleCallbacks.onExternalSessionDetected?.(event.session_id, transcriptPath, cwd);
       agentId = this.sessionRouter.resolve(event.session_id);
       if (agentId === undefined) {
         for (const [id, agent] of this.agents) {

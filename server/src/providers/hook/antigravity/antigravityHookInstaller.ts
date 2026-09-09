@@ -106,7 +106,10 @@ export async function installHooks(packageRoot?: string): Promise<void> {
   const configJsonPath = getGeminiConfigJsonPath();
   if (fs.existsSync(configJsonPath)) {
     try {
-      const config = JSON.parse(fs.readFileSync(configJsonPath, 'utf-8')) as Record<string, unknown>;
+      const config = JSON.parse(fs.readFileSync(configJsonPath, 'utf-8')) as Record<
+        string,
+        unknown
+      >;
       const plugins = (config.plugins || {}) as Record<string, unknown>;
       plugins['kibee-pixel-agents'] = { enabled: true };
       config.plugins = plugins;
@@ -135,7 +138,10 @@ export async function uninstallHooks(): Promise<void> {
   const configJsonPath = getGeminiConfigJsonPath();
   if (fs.existsSync(configJsonPath)) {
     try {
-      const config = JSON.parse(fs.readFileSync(configJsonPath, 'utf-8')) as Record<string, unknown>;
+      const config = JSON.parse(fs.readFileSync(configJsonPath, 'utf-8')) as Record<
+        string,
+        unknown
+      >;
       const plugins = (config.plugins || {}) as Record<string, unknown>;
       if (plugins['kibee-pixel-agents']) {
         plugins['kibee-pixel-agents'] = { enabled: false };

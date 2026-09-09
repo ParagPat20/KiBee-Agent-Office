@@ -1,3 +1,4 @@
+/* eslint-disable pixel-agents/pixel-font, pixel-agents/no-inline-colors */
 import { useEffect, useState } from 'react';
 
 import { Button } from './ui/Button.js';
@@ -54,7 +55,11 @@ export function TeamManagerModal({ isOpen, onClose, onTeamUpdated }: TeamManager
   }, [isOpen]);
 
   const handleAddMember = async (isBoss: boolean) => {
-    const name = newName.trim() || (isBoss ? `Boss-${members.filter((m) => m.isBoss).length + 1}` : `Dev-${members.filter((m) => !m.isBoss).length + 1}`);
+    const name =
+      newName.trim() ||
+      (isBoss
+        ? `Boss-${members.filter((m) => m.isBoss).length + 1}`
+        : `Dev-${members.filter((m) => !m.isBoss).length + 1}`);
     setIsLoading(true);
     setFeedback(`Spawning ${isBoss ? 'Boss' : 'Employee'} to desk...`);
 

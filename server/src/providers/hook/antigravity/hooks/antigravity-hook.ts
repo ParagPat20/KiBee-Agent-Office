@@ -70,10 +70,7 @@ function readLegacyServerJson(): ServerTarget | null {
   return null;
 }
 
-function postToServer(
-  server: ServerTarget,
-  body: string,
-): Promise<void> {
+function postToServer(server: ServerTarget, body: string): Promise<void> {
   return new Promise((resolve) => {
     try {
       const req = http.request(
@@ -142,7 +139,8 @@ async function main(): Promise<void> {
     // Extract Antigravity toolCall / hook info
     const preArgs = parsed.preToolHookArgs as Record<string, unknown> | undefined;
     const postArgs = parsed.postToolHookArgs as Record<string, unknown> | undefined;
-    const toolCall = (preArgs?.toolCall || postArgs?.toolCall) as Record<string, unknown> | undefined;
+    const toolCall = (preArgs?.toolCall || postArgs?.toolCall) as
+      Record<string, unknown> | undefined;
 
     let toolName =
       (toolCall?.name as string) ||
@@ -163,10 +161,7 @@ async function main(): Promise<void> {
       (parsed.sessionId as string) ||
       'antigravity-session';
 
-    const cwd =
-      (parsed.cwd as string) ||
-      (preArgs?.cwd as string) ||
-      process.cwd();
+    const cwd = (parsed.cwd as string) || (preArgs?.cwd as string) || process.cwd();
 
     let hookEventName = 'PreToolUse';
     if (parsed.terminationReason !== undefined || parsed.executionNum !== undefined) {

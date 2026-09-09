@@ -102,7 +102,11 @@ export function SettingsModal({
       </MenuItem>
       <MenuItem
         onClick={async () => {
-          if (window.confirm('Reset office to default OxiTech layout? Any unsaved edits will be replaced.')) {
+          if (
+            window.confirm(
+              'Reset office to default OxiTech layout? Any unsaved edits will be replaced.',
+            )
+          ) {
             try {
               const res = await fetch('/api/layout/reset', { method: 'POST' });
               if (res.ok) {

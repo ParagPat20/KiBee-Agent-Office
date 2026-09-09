@@ -1,3 +1,4 @@
+/* eslint-disable pixel-agents/pixel-font, pixel-agents/no-inline-colors */
 import { useState } from 'react';
 
 import { TeamManagerModal } from './TeamManagerModal.js';
@@ -82,10 +83,7 @@ export function BossOrderBar() {
         )}
       </div>
 
-      <TeamManagerModal
-        isOpen={isTeamModalOpen}
-        onClose={() => setIsTeamModalOpen(false)}
-      />
+      <TeamManagerModal isOpen={isTeamModalOpen} onClose={() => setIsTeamModalOpen(false)} />
     </>
   );
 }

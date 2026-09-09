@@ -29,13 +29,12 @@ export interface TeamMemberInfo {
 }
 
 export function getGeminiApiKey(): string {
-  if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY.length > 5) return process.env.GEMINI_API_KEY;
-  if (process.env.GOOGLE_API_KEY && process.env.GOOGLE_API_KEY.length > 5) return process.env.GOOGLE_API_KEY;
+  if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY.length > 5)
+    return process.env.GEMINI_API_KEY;
+  if (process.env.GOOGLE_API_KEY && process.env.GOOGLE_API_KEY.length > 5)
+    return process.env.GOOGLE_API_KEY;
 
-  const envPaths = [
-    path.join(process.cwd(), '.env'),
-    path.resolve(process.cwd(), '..', '.env'),
-  ];
+  const envPaths = [path.join(process.cwd(), '.env'), path.resolve(process.cwd(), '..', '.env')];
 
   for (const envPath of envPaths) {
     try {
@@ -123,7 +122,9 @@ function inferFileNameFromOrder(order: string, userSpecifiedName?: string): stri
     return fileMention[1];
   }
 
-  if (/\b(arduino|nano|uno|esp32|pid|motor|led|blink|servo|sensor|embedded|firmware)\b/i.test(lower)) {
+  if (
+    /\b(arduino|nano|uno|esp32|pid|motor|led|blink|servo|sensor|embedded|firmware)\b/i.test(lower)
+  ) {
     if (lower.includes('pid') || lower.includes('motor')) return 'arduino_nano_pid.ino';
     if (lower.includes('blink') || lower.includes('led')) return 'arduino_nano_blink.ino';
     return 'arduino_sketch.ino';
@@ -156,7 +157,10 @@ function inferFileNameFromOrder(order: string, userSpecifiedName?: string): stri
   return 'solution.txt';
 }
 
-function inferCommandFromOrder(order: string, workerDir?: string): { isRun: boolean; command: string } {
+function inferCommandFromOrder(
+  order: string,
+  workerDir?: string,
+): { isRun: boolean; command: string } {
   const lower = order.toLowerCase().trim();
 
   // 1. Explicit mention of antigravity cli or agy
@@ -174,13 +178,18 @@ function inferCommandFromOrder(order: string, workerDir?: string): { isRun: bool
   }
 
   // 3. Asking to run a python script / test
-  if (/\b(run|execute|test)\b.*\b(python|script\.py|\.py)\b/i.test(lower) || /\b(python)\b.*\b(run|execute|test)\b/i.test(lower)) {
+  if (
+    /\b(run|execute|test)\b.*\b(python|script\.py|\.py)\b/i.test(lower) ||
+    /\b(python)\b.*\b(run|execute|test)\b/i.test(lower)
+  ) {
     let pyFile = 'script.py';
     if (workerDir && fs.existsSync(workerDir)) {
       try {
         const files = fs.readdirSync(workerDir).filter((f) => f.endsWith('.py'));
         if (files.length > 0) pyFile = files[0];
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
     }
     return { isRun: true, command: `python ${pyFile}` };
   }
@@ -194,13 +203,18 @@ function inferCommandFromOrder(order: string, workerDir?: string): { isRun: bool
         if (py) return { isRun: true, command: `python ${py}` };
         const js = files.find((f) => f.endsWith('.js'));
         if (js) return { isRun: true, command: `node ${js}` };
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
     }
     return { isRun: true, command: 'python script.py' };
   }
 
   // 5. Asking to run a command on PowerShell / CMD / terminal
-  if (/\b(powershell|powersheel|terminal|cmd|shell|cli)\b/i.test(lower) && /\b(run|running|execute|exec|test|command)\b/i.test(lower)) {
+  if (
+    /\b(powershell|powersheel|terminal|cmd|shell|cli)\b/i.test(lower) &&
+    /\b(run|running|execute|exec|test|command)\b/i.test(lower)
+  ) {
     const quoteMatch = order.match(/["'`]([^"'`]+)["'`]/);
     if (quoteMatch) {
       return { isRun: true, command: quoteMatch[1].trim() };
@@ -213,7 +227,9 @@ function inferCommandFromOrder(order: string, workerDir?: string): { isRun: bool
   }
 
   // 6. Direct command patterns like "run npm install", "run node app.js"
-  const directMatch = order.match(/\b(?:run|execute)\s+(npm\s+\w+|node\s+\S+|python\s+\S+|pip\s+\S+|git\s+\S+|dir|ls|echo\s+.+)/i);
+  const directMatch = order.match(
+    /\b(?:run|execute)\s+(npm\s+\w+|node\s+\S+|python\s+\S+|pip\s+\S+|git\s+\S+|dir|ls|echo\s+.+)/i,
+  );
   if (directMatch) {
     return { isRun: true, command: directMatch[1].trim() };
   }
@@ -221,7 +237,11 @@ function inferCommandFromOrder(order: string, workerDir?: string): { isRun: bool
   return { isRun: false, command: '' };
 }
 
-function generateFallbackCode(worker: TeamMemberInfo, fileName: string, taskAction: string): string {
+function generateFallbackCode(
+  worker: TeamMemberInfo,
+  fileName: string,
+  taskAction: string,
+): string {
   const ext = path.extname(fileName).toLowerCase();
   if (ext === '.py') {
     return (
@@ -257,7 +277,8 @@ function generateFallbackCode(worker: TeamMemberInfo, fileName: string, taskActi
     );
   }
   if (ext === '.html') {
-    return (
+    /* eslint-disable pixel-agents/no-inline-colors */
+    const html =
       `<!DOCTYPE html>\n` +
       `<html lang="en">\n` +
       `<head>\n` +
@@ -267,7 +288,10 @@ function generateFallbackCode(worker: TeamMemberInfo, fileName: string, taskActi
       `    body { font-family: system-ui, sans-serif; background: #0f172a; color: #f8fafc; padding: 2rem; }\n` +
       `    .card { background: #1e293b; padding: 1.5rem; border-radius: 8px; border: 1px solid #334155; }\n` +
       `  </style>\n` +
-      `</head>\n` +
+      `</head>\n`;
+    /* eslint-enable pixel-agents/no-inline-colors */
+    return (
+      html +
       `<body>\n` +
       `  <div class="card">\n` +
       `    <h1>${taskAction}</h1>\n` +
@@ -360,7 +384,10 @@ export function getEmployeeWorkspace(employeeName: string): EmployeeWorkspaceDat
   return defaultData;
 }
 
-export function setEmployeeWorkspaceFolder(employeeName: string, folderRelPath: string): EmployeeWorkspaceData {
+export function setEmployeeWorkspaceFolder(
+  employeeName: string,
+  folderRelPath: string,
+): EmployeeWorkspaceData {
   const norm = employeeName.trim();
   const current = getEmployeeWorkspace(norm);
   const cleanPath = folderRelPath.trim().replace(/^[\\/]+|[\\/]+$/g, '') || '.';
@@ -370,7 +397,10 @@ export function setEmployeeWorkspaceFolder(employeeName: string, folderRelPath: 
   return current;
 }
 
-export function recordEmployeeDeed(employeeName: string, deed: Omit<PastDeed, 'id' | 'timestamp'>): PastDeed {
+export function recordEmployeeDeed(
+  employeeName: string,
+  deed: Omit<PastDeed, 'id' | 'timestamp'>,
+): PastDeed {
   const norm = employeeName.trim();
   const current = getEmployeeWorkspace(norm);
   const fullDeed: PastDeed = {
@@ -451,7 +481,9 @@ export function getWorkspaceTree(subpath = ''): WorkspaceTreeResult {
   };
 }
 
-export function getAllEmployeeWorkspaces(teamRoster: TeamMemberInfo[] = []): EmployeeWorkspaceInfo[] {
+export function getAllEmployeeWorkspaces(
+  teamRoster: TeamMemberInfo[] = [],
+): EmployeeWorkspaceInfo[] {
   const rootDir = process.cwd();
   const results: EmployeeWorkspaceInfo[] = [];
 
@@ -471,13 +503,22 @@ export function getAllEmployeeWorkspaces(teamRoster: TeamMemberInfo[] = []): Emp
 
   for (const name of names) {
     const matchedRoster = teamRoster.find((m) => m.name.toLowerCase() === name.toLowerCase());
-    const role = matchedRoster?.role || getSavedRole(name) || (/boss/i.test(name) ? 'Executive Director / Boss' : 'Software Engineer');
+    const role =
+      matchedRoster?.role ||
+      getSavedRole(name) ||
+      (/boss/i.test(name) ? 'Executive Director / Boss' : 'Software Engineer');
     const ws = getEmployeeWorkspace(name);
     const assigned = ws.assignedFolder || name;
     const fullPath = path.resolve(rootDir, assigned);
     const exists = fs.existsSync(fullPath);
 
-    const files: Array<{ name: string; isDir: boolean; size: number; ext: string; updatedAt: number }> = [];
+    const files: Array<{
+      name: string;
+      isDir: boolean;
+      size: number;
+      ext: string;
+      updatedAt: number;
+    }> = [];
     if (exists) {
       try {
         const entries = fs.readdirSync(fullPath, { withFileTypes: true });
@@ -532,13 +573,18 @@ async function generateWorkerFileContent(
     return `// Implemented by ${worker.name} (${worker.role}) for: ${overallOrder}\n`;
   }
   const fileName = path.basename(destPath);
-  const filesList = context?.existingFiles && context.existingFiles.length > 0
-    ? `Existing files in your directory:\n${context.existingFiles.map((f) => `- ${f}`).join('\n')}`
-    : 'Folder is currently clean / empty.';
+  const filesList =
+    context?.existingFiles && context.existingFiles.length > 0
+      ? `Existing files in your directory:\n${context.existingFiles.map((f) => `- ${f}`).join('\n')}`
+      : 'Folder is currently clean / empty.';
 
-  const deedsList = context?.pastDeeds && context.pastDeeds.length > 0
-    ? `Your past deeds/context in this workspace:\n${context.pastDeeds.slice(0, 4).map((d) => `- Task: "${d.task}" -> created ${d.fileName} (${d.summary})`).join('\n')}`
-    : 'No previous recorded deeds in this workspace.';
+  const deedsList =
+    context?.pastDeeds && context.pastDeeds.length > 0
+      ? `Your past deeds/context in this workspace:\n${context.pastDeeds
+          .slice(0, 4)
+          .map((d) => `- Task: "${d.task}" -> created ${d.fileName} (${d.summary})`)
+          .join('\n')}`
+      : 'No previous recorded deeds in this workspace.';
 
   const prompt =
     `You are ${worker.name}, a senior ${worker.role} at OxiTech.\n` +
@@ -643,15 +689,16 @@ export function getTeamMembers(store: AgentStateStore): TeamMemberInfo[] {
         folder = folder || `Agent-${id}`;
       }
     }
-    const isBoss = folder.toLowerCase().includes('boss') || a.sessionId.toLowerCase().includes('boss');
+    const isBoss =
+      folder.toLowerCase().includes('boss') || a.sessionId.toLowerCase().includes('boss');
     let currentStatus = a.isWaiting ? 'Waiting for orders' : 'Active';
     if (a.activeToolStatuses && a.activeToolStatuses.size > 0) {
       currentStatus = Array.from(a.activeToolStatuses.values())[0];
     }
     const savedRole = getSavedRole(folder, a.sessionId);
     const role = isBoss
-      ? (savedRole || 'Executive Boss / Director')
-      : (savedRole || (a.isExternal ? 'AI Systems Specialist' : 'Fullstack Engineer'));
+      ? savedRole || 'Executive Boss / Director'
+      : savedRole || (a.isExternal ? 'AI Systems Specialist' : 'Fullstack Engineer');
 
     members.push({
       id,
@@ -768,7 +815,9 @@ export interface BossOrderResult {
   tasks: DecomposedTask[];
 }
 
-export async function ensureDefaultOfficeTeam(options: HttpServerOptions): Promise<TeamMemberInfo[]> {
+export async function ensureDefaultOfficeTeam(
+  options: HttpServerOptions,
+): Promise<TeamMemberInfo[]> {
   let team = getTeamMembers(options.store);
   if (team.length > 0) return team;
 
@@ -780,7 +829,8 @@ export async function ensureDefaultOfficeTeam(options: HttpServerOptions): Promi
   if (existingDirs.length > 0) {
     for (const dir of existingDirs) {
       const isBoss = dir.toLowerCase().includes('boss');
-      const role = getSavedRole(dir) || (isBoss ? 'Executive Boss / Director' : 'Fullstack Engineer');
+      const role =
+        getSavedRole(dir) || (isBoss ? 'Executive Boss / Director' : 'Fullstack Engineer');
       await addAgentToOffice(options, dir, role, isBoss);
     }
   } else {
@@ -808,7 +858,10 @@ export async function executeBossOrder(
 
   const apiKey = getGeminiApiKey();
 
-  const isLayoutFixOrder = /\b(reset|fix|bring back|restore|clean|revert)\b.*\b(office|layout|design|room|walls|furniture)\b/i.test(order);
+  const isLayoutFixOrder =
+    /\b(reset|fix|bring back|restore|clean|revert)\b.*\b(office|layout|design|room|walls|furniture)\b/i.test(
+      order,
+    );
   if (isLayoutFixOrder) {
     let defaultLayout = options.assetCache?.defaultLayout as Record<string, unknown> | undefined;
     if (!defaultLayout) {
@@ -831,7 +884,8 @@ export async function executeBossOrder(
       writeLayoutToFile(defaultLayout);
       options.store.broadcast({ type: 'layoutLoaded', layout: defaultLayout });
     }
-    const layoutReply = "Right away, Director! I've restored the pristine OxiTech headquarters office layout. All walls, floors, and workstations are back in order.";
+    const layoutReply =
+      "Right away, Director! I've restored the pristine OxiTech headquarters office layout. All walls, floors, and workstations are back in order.";
 
     if (boss) {
       options.store.broadcast({
@@ -890,15 +944,26 @@ export async function executeBossOrder(
         let existingFiles: string[] = [];
         try {
           const fp = path.join(rootDir, folder);
-          if (fs.existsSync(fp)) existingFiles = fs.readdirSync(fp).filter(f => !f.startsWith('.') && f !== 'node_modules').slice(0, 8);
-        } catch { /* ignore */ }
-        const deedSummary = ws.pastDeeds.slice(0, 3).map(d => `"${d.task}" → ${d.fileName}`).join('; ') || 'none yet';
+          if (fs.existsSync(fp))
+            existingFiles = fs
+              .readdirSync(fp)
+              .filter((f) => !f.startsWith('.') && f !== 'node_modules')
+              .slice(0, 8);
+        } catch {
+          /* ignore */
+        }
+        const deedSummary =
+          ws.pastDeeds
+            .slice(0, 3)
+            .map((d) => `"${d.task}" → ${d.fileName}`)
+            .join('; ') || 'none yet';
         return (
           `${idx + 1}. Name: "${w.name}" | Role: "${w.role}" | Availability: ${w.isWaiting ? 'FREE' : 'BUSY'} | ` +
           `Workspace: "${folder}" | Files: [${existingFiles.join(', ') || 'empty'}] | Recent work: ${deedSummary}`
         );
       });
-      const rosterPrompt = rosterLines.length > 0 ? rosterLines.join('\n') : 'No workers currently registered.';
+      const rosterPrompt =
+        rosterLines.length > 0 ? rosterLines.join('\n') : 'No workers currently registered.';
 
       const prompt =
         `You are the Executive Boss AI at OxiTech, directing an engineering team inside the Pixel Agents Office.\n` +
@@ -974,7 +1039,9 @@ export async function executeBossOrder(
       reply = (parsed.reply as string) || '';
 
       const rawTasks = Array.isArray(parsed.tasks) ? parsed.tasks : [];
-      const nameMatch = order.match(/(?:called|named|file|create)\s+([a-zA-Z0-9._-]+\.[a-zA-Z0-9]+)/i);
+      const nameMatch = order.match(
+        /(?:called|named|file|create)\s+([a-zA-Z0-9._-]+\.[a-zA-Z0-9]+)/i,
+      );
       const userSpecifiedName = nameMatch ? nameMatch[1] : '';
 
       const validTasks: DecomposedTask[] = [];
@@ -1015,7 +1082,7 @@ export async function executeBossOrder(
             fileName: isRun ? '' : fileName,
             targetPath: targetPath || fileName,
             code: t.code || t.content || t.script || '',
-            tool: isRun ? 'run_command' : (t.tool || 'write_to_file'),
+            tool: isRun ? 'run_command' : t.tool || 'write_to_file',
             detail: t.detail || action,
             command: t.command || (isRun ? cmdCheck.command : ''),
           });
@@ -1036,21 +1103,33 @@ export async function executeBossOrder(
 
         let chosenWorker: TeamMemberInfo | undefined = namedWorker;
         if (!chosenWorker) {
-          const isHardware = /\b(arduino|nano|uno|esp32|pid|motor|embedded|firmware|hardware|robotics|sensors?|microcontroller)\b/i.test(lowerOrder);
-          const isBackend = /\b(backend|api|server|database|sql|endpoint|node|express|python|rust|c\+\+|cpp|c)\b/i.test(lowerOrder) || isHardware;
-          const isFrontend = /\b(frontend|ui|css|html|react|design|button|page|view|navbar|tailwind)\b/i.test(lowerOrder);
+          const isHardware =
+            /\b(arduino|nano|uno|esp32|pid|motor|embedded|firmware|hardware|robotics|sensors?|microcontroller)\b/i.test(
+              lowerOrder,
+            );
+          const isBackend =
+            /\b(backend|api|server|database|sql|endpoint|node|express|python|rust|c\+\+|cpp|c)\b/i.test(
+              lowerOrder,
+            ) || isHardware;
+          const isFrontend =
+            /\b(frontend|ui|css|html|react|design|button|page|view|navbar|tailwind)\b/i.test(
+              lowerOrder,
+            );
 
           if (isHardware) {
-            chosenWorker = workers.find((w) => /backend/i.test(w.role) && w.isWaiting) ||
+            chosenWorker =
+              workers.find((w) => /backend/i.test(w.role) && w.isWaiting) ||
               workers.find((w) => /fullstack/i.test(w.role) && w.isWaiting) ||
               workers.find((w) => /backend/i.test(w.role)) ||
               workers.find((w) => /fullstack/i.test(w.role));
           } else if (isBackend) {
-            chosenWorker = workers.find((w) => /backend/i.test(w.role) && w.isWaiting) ||
+            chosenWorker =
+              workers.find((w) => /backend/i.test(w.role) && w.isWaiting) ||
               workers.find((w) => /fullstack/i.test(w.role) && w.isWaiting) ||
               workers.find((w) => /backend/i.test(w.role));
           } else if (isFrontend) {
-            chosenWorker = workers.find((w) => /frontend/i.test(w.role) && w.isWaiting) ||
+            chosenWorker =
+              workers.find((w) => /frontend/i.test(w.role) && w.isWaiting) ||
               workers.find((w) => /fullstack/i.test(w.role) && w.isWaiting) ||
               workers.find((w) => /frontend/i.test(w.role));
           }
@@ -1072,7 +1151,9 @@ export async function executeBossOrder(
               code: '',
               tool: cmdCheck.isRun ? 'run_command' : 'write_to_file',
               command: cmdCheck.isRun ? cmdCheck.command : '',
-              detail: cmdCheck.isRun ? `Ran command: ${cmdCheck.command}` : `Implementation of ${order}`,
+              detail: cmdCheck.isRun
+                ? `Ran command: ${cmdCheck.command}`
+                : `Implementation of ${order}`,
             },
           ];
         }
@@ -1092,7 +1173,9 @@ export async function executeBossOrder(
     } else {
       isDirective = true;
       const isDesktop = order.toLowerCase().includes('desktop');
-      const nameMatch = order.match(/(?:called|named|file|create)\s+([a-zA-Z0-9._-]+\.[a-zA-Z0-9]+)/i);
+      const nameMatch = order.match(
+        /(?:called|named|file|create)\s+([a-zA-Z0-9._-]+\.[a-zA-Z0-9]+)/i,
+      );
       const userSpecifiedName = nameMatch ? nameMatch[1] : undefined;
       const fallbackFile = inferFileNameFromOrder(order, userSpecifiedName);
 
@@ -1105,21 +1188,33 @@ export async function executeBossOrder(
 
       let chosenWorker = namedWorker;
       if (!chosenWorker) {
-        const isHardware = /\b(arduino|nano|uno|esp32|pid|motor|embedded|firmware|hardware|robotics|sensors?|microcontroller)\b/i.test(lowerOrder);
-        const isBackend = /\b(backend|api|server|database|sql|endpoint|node|express|python|rust|c\+\+|cpp|c)\b/i.test(lowerOrder) || isHardware;
-        const isFrontend = /\b(frontend|ui|css|html|react|design|button|page|view|navbar|tailwind)\b/i.test(lowerOrder);
+        const isHardware =
+          /\b(arduino|nano|uno|esp32|pid|motor|embedded|firmware|hardware|robotics|sensors?|microcontroller)\b/i.test(
+            lowerOrder,
+          );
+        const isBackend =
+          /\b(backend|api|server|database|sql|endpoint|node|express|python|rust|c\+\+|cpp|c)\b/i.test(
+            lowerOrder,
+          ) || isHardware;
+        const isFrontend =
+          /\b(frontend|ui|css|html|react|design|button|page|view|navbar|tailwind)\b/i.test(
+            lowerOrder,
+          );
 
         if (isHardware) {
-          chosenWorker = workers.find((w) => /backend/i.test(w.role) && w.isWaiting) ||
+          chosenWorker =
+            workers.find((w) => /backend/i.test(w.role) && w.isWaiting) ||
             workers.find((w) => /fullstack/i.test(w.role) && w.isWaiting) ||
             workers.find((w) => /backend/i.test(w.role)) ||
             workers.find((w) => /fullstack/i.test(w.role));
         } else if (isBackend) {
-          chosenWorker = workers.find((w) => /backend/i.test(w.role) && w.isWaiting) ||
+          chosenWorker =
+            workers.find((w) => /backend/i.test(w.role) && w.isWaiting) ||
             workers.find((w) => /fullstack/i.test(w.role) && w.isWaiting) ||
             workers.find((w) => /backend/i.test(w.role));
         } else if (isFrontend) {
-          chosenWorker = workers.find((w) => /frontend/i.test(w.role) && w.isWaiting) ||
+          chosenWorker =
+            workers.find((w) => /frontend/i.test(w.role) && w.isWaiting) ||
             workers.find((w) => /fullstack/i.test(w.role) && w.isWaiting) ||
             workers.find((w) => /frontend/i.test(w.role));
         }
@@ -1255,7 +1350,12 @@ export async function executeBossOrder(
     // Strip any path prefix the Boss may have added (keep only the filename)
     if (base.includes('/') || base.includes('\\')) base = path.basename(base);
     // Reject generic placeholder names and re-infer
-    if (!base || ['task_output.txt', 'output.txt', 'solution.txt', 'desktop_file.txt', 'output.js'].includes(base)) {
+    if (
+      !base ||
+      ['task_output.txt', 'output.txt', 'solution.txt', 'desktop_file.txt', 'output.js'].includes(
+        base,
+      )
+    ) {
       base = inferFileNameFromOrder(order);
     }
     const destPath = path.join(workerDir, base);
@@ -1264,10 +1364,13 @@ export async function executeBossOrder(
     // ── Always read workspace context BEFORE generating/using code ──────────
     let existingFiles: string[] = [];
     try {
-      existingFiles = fs.readdirSync(workerDir)
+      existingFiles = fs
+        .readdirSync(workerDir)
         .filter((f) => !f.startsWith('.') && f !== 'node_modules')
         .slice(0, 20);
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
 
     const isRunCommand = task.tool === 'run_command' || Boolean(task.command);
 
@@ -1291,11 +1394,15 @@ export async function executeBossOrder(
       try {
         const isWindows = process.platform === 'win32';
         const result = isWindows
-          ? childProcess.spawnSync('powershell.exe', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', cmd], {
-              cwd: workerDir,
-              timeout: 30000,
-              encoding: 'utf-8',
-            })
+          ? childProcess.spawnSync(
+              'powershell.exe',
+              ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', cmd],
+              {
+                cwd: workerDir,
+                timeout: 30000,
+                encoding: 'utf-8',
+              },
+            )
           : childProcess.spawnSync(cmd, {
               shell: true,
               cwd: workerDir,
@@ -1314,8 +1421,14 @@ export async function executeBossOrder(
       // Also persist to task_output.txt so employee workspace has an audit log
       const taskOutputFile = path.join(workerDir, 'task_output.txt');
       try {
-        fs.writeFileSync(taskOutputFile, `Command: ${cmd}\nTimestamp: ${new Date().toISOString()}\n\nOutput:\n${trimmedOutput}\n`, 'utf-8');
-      } catch { /* ignore */ }
+        fs.writeFileSync(
+          taskOutputFile,
+          `Command: ${cmd}\nTimestamp: ${new Date().toISOString()}\n\nOutput:\n${trimmedOutput}\n`,
+          'utf-8',
+        );
+      } catch {
+        /* ignore */
+      }
 
       // Record deed
       recordEmployeeDeed(worker.name, {
@@ -1362,7 +1475,8 @@ export async function executeBossOrder(
 
     // ── File-creation task ──────────────────────────────────────────────────
     let fileContent = task.code;
-    const isGenericContent = !fileContent ||
+    const isGenericContent =
+      !fileContent ||
       fileContent.trim().length === 0 ||
       fileContent.includes('Completed successfully') ||
       fileContent.includes('=========================================') ||

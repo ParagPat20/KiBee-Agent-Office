@@ -1,4 +1,5 @@
 import * as path from 'path';
+
 import type { HookProvider } from '../../core/src/provider.js';
 import { resendAgentActivity } from './agentActivityResend.js';
 import { buildAgentDiagnostics } from './agentDiagnostics.js';
@@ -490,13 +491,17 @@ function handleWebviewReady(send: WsSend, ctx: ClientMessageContext): void {
       agent.folderName ||
       (agent.projectDir ? path.basename(agent.projectDir) : '') ||
       agent.agentName ||
-      (agent.sessionId?.includes('boss') ? 'Boss-1' :
-       agent.sessionId?.includes('roy') ? 'ROY' :
-       agent.sessionId?.includes('jack') ? 'JACK' :
-       agent.sessionId?.includes('rickey') ? 'Rickey' :
-       /^[0-9a-f]{8}-[0-9a-f]{4}/i.test(agent.sessionId || '') ? `Antigravity-${id}` :
-       agent.sessionId?.replace(/^kibee-(emp-|boss-)?/i, '') ||
-       `Agent-${id}`);
+      (agent.sessionId?.includes('boss')
+        ? 'Boss-1'
+        : agent.sessionId?.includes('roy')
+          ? 'ROY'
+          : agent.sessionId?.includes('jack')
+            ? 'JACK'
+            : agent.sessionId?.includes('rickey')
+              ? 'Rickey'
+              : /^[0-9a-f]{8}-[0-9a-f]{4}/i.test(agent.sessionId || '')
+                ? `Antigravity-${id}`
+                : agent.sessionId?.replace(/^kibee-(emp-|boss-)?/i, '') || `Agent-${id}`);
     folderNames[id] = name;
     if (agent.isExternal) {
       externalAgents[id] = true;

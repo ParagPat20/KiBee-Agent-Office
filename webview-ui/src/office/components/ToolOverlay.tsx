@@ -231,7 +231,9 @@ export function ToolOverlay({
               >
                 <div className="flex items-center justify-between gap-2 border-b border-border/40 pb-0.5">
                   <span className="font-bold text-[10px] text-accent-bright flex items-center gap-1">
-                    {ch.folderName?.toLowerCase().includes('boss') ? '👑 Boss' : '💼 ' + (ch.folderName || 'Employee')}
+                    {ch.folderName?.toLowerCase().includes('boss')
+                      ? '👑 Boss'
+                      : '💼 ' + (ch.folderName || 'Employee')}
                   </span>
                   <span className="text-[10px] text-text-muted hover:text-text">×</span>
                 </div>

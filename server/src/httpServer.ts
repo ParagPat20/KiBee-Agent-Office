@@ -266,14 +266,17 @@ function registerBossRoute(app: FastifyInstance, options: HttpServerOptions): vo
   });
 
   // Assign Employee to Folder (moving to child/parent or specific path)
-  app.post<{ Body: { employeeName?: string; folderPath?: string } }>('/api/employee/assign-folder', async (request, reply) => {
-    const { employeeName, folderPath } = request.body || {};
-    if (!employeeName || typeof folderPath !== 'string') {
-      return reply.status(400).send({ error: 'employeeName and folderPath are required' });
-    }
-    const updated = setEmployeeWorkspaceFolder(employeeName, folderPath);
-    return reply.send({ status: 'ok', employeeName, assignedFolder: updated.assignedFolder });
-  });
+  app.post<{ Body: { employeeName?: string; folderPath?: string } }>(
+    '/api/employee/assign-folder',
+    async (request, reply) => {
+      const { employeeName, folderPath } = request.body || {};
+      if (!employeeName || typeof folderPath !== 'string') {
+        return reply.status(400).send({ error: 'employeeName and folderPath are required' });
+      }
+      const updated = setEmployeeWorkspaceFolder(employeeName, folderPath);
+      return reply.send({ status: 'ok', employeeName, assignedFolder: updated.assignedFolder });
+    },
+  );
 
   // Get Past Deeds for Employee
   app.get<{ Querystring: { employee?: string } }>('/api/employee/deeds', async (request, reply) => {
